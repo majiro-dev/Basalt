@@ -1,7 +1,7 @@
-
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 import os
 import sys
+import json
 
 app = Flask(__name__)
 folder_path = ''
@@ -43,6 +43,87 @@ def get_text():
 		file.write(text)
 	return redirect("/")
 
+
+# ****** Tareas ********
+
+@app.route('/tasks')
+def tasks():
+    task_lists = get_task_lists()
+    tasks = []
+    if task_lists:
+        tasks = load_tasks(task_lists[0])
+    return render_template('tasks.html', tasks=tasks, task_lists=task_lists)
+
+@app.route('/add_task', methods=['POST'])
+def add_task():
+    task_name = request.form['task_name']
+    task_list_name = request.form['task_list_name']
+    tasks = load_tasks(task_list_name)
+    tasks.append({'id': len(tasks) + 1, 'name': task_name, 'completed': False})
+    save_tasks(task_list_name, tasks)
+    return redirect('/tasks')
+
+@app.route('/delete_task/<int:task_id>', methods=['POST'])
+def delete_task(task_id):
+    task_list_name = request.form['task_list_name']
+    tasks = load_tasks(task_list_name)
+    tasks = [task for task in tasks if task['id'] != task_id]
+    save_tasks(task_list_name, tasks)
+    return redirect('/tasks')
+
+@app.route('/toggle_task/<int:task_id>', methods=['POST'])
+def toggle_task(task_id):
+    task_list_name = request.form['task_list_name']
+    tasks = load_tasks(task_list_name)
+    for task in tasks:
+        if task['id'] == task_id:
+            task['completed'] = not task['completed']
+            break
+    save_tasks(task_list_name, tasks)
+    return redirect('/tasks')
+
+@app.route('/save_tasks/<task_list_name>', methods=['POST'])
+def save_tasks_route(task_list_name):
+    tasks = request.json['tasks']
+    save_tasks(task_list_name, tasks)
+    return jsonify({'status': 'success'})
+
+@app.route('/create_task_list', methods=['POST'])
+def create_task_list():
+    task_list_name = request.json['task_list_name']
+    if not os.path.exists('task_lists'):
+        os.makedirs('task_lists')
+    with open(f'task_lists/{task_list_name}.json', 'w') as f:
+        json.dump([], f)  # Inicializar el archivo con un array vacío
+    return jsonify({'status': 'success'})
+
+@app.route('/load_tasks/<task_list_name>', methods=['GET'])
+def load_tasks_route(task_list_name):
+    tasks = load_tasks(task_list_name)
+    return jsonify({'tasks': tasks})
+
+def get_task_lists():
+    if not os.path.exists('task_lists'):
+        return []
+    return [f.replace('.json', '') for f in os.listdir('task_lists') if f.endswith('.json')]
+
+def load_tasks(task_list_name):
+    if os.path.exists(f'task_lists/{task_list_name}.json'):
+        with open(f'task_lists/{task_list_name}.json', 'r') as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []  # Retornar un array vacío si el archivo está vacío o no es un JSON válido
+    return []
+
+def save_tasks(task_list_name, tasks):
+    with open(f'task_lists/{task_list_name}.json', 'w') as f:
+        json.dump(tasks, f)
+
+
+# ***********************************************
+
+
 def init():
 	global folder_path
 	global current_file
@@ -60,3 +141,4 @@ def init():
 if __name__ == '__main__':
 	init()
 	app.run(debug=True)
+
