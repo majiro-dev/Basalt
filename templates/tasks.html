@@ -25,6 +25,11 @@
                 <h2>Tareas</h2>
                 <input type="text" id="task-list-name" class="form-control mt-2" placeholder="Nombre de la lista de tareas">
                 <button onclick="createTaskList()">Crear Lista de Tareas</button>
+                <ul id="task-list-selector" class="list-group mt-2">
+                    {% for list_name in task_lists %}
+                    <li class="list-group-item" onclick="loadTaskList('{{ list_name }}')">{{ list_name }}</li>
+                    {% endfor %}
+                </ul>
             </div>
             <div id="editor" class="col-md-9 vh-100 p-3">
                 <h2>Editor de Tareas</h2>
@@ -44,6 +49,14 @@
             </div>
         </div>
         <script>
+            let currentTaskListName = '';
+
+            function addTask() {
+                const taskName = document.getElementById('task-name').value;
+                if (!currentTaskListName) {
+                    alert('Por favor, seleccione una lista de tareas.');
+                    return;
+                }
             function addTask() {
                 const taskName = document.getElementById('task-name').value;
                 if (taskName) {
@@ -66,16 +79,64 @@
             }
 
             function saveTasks() {
-                // Implementar lógica para guardar tareas
+                if (!currentTaskListName) {
+                    alert('Por favor, seleccione una lista de tareas.');
+                    return;
+                }
+                const tasks = [];
+                document.querySelectorAll('#task-list li').forEach((li, index) => {
+                    const taskName = li.textContent.replace('Borrar', '').trim();
+                    const completed = li.querySelector('input[type="checkbox"]').checked;
+                    tasks.push({ id: index + 1, name: taskName, completed: completed });
+                });
+                fetch(`/save_tasks/${currentTaskListName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ tasks: tasks })
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 'success') {
+                        alert('Tareas guardadas con éxito.');
+                    } else {
+                        alert('Error al guardar las tareas.');
+                    }
+                });
             }
 
             function createTaskList() {
                 const taskListName = document.getElementById('task-list-name').value;
                 if (taskListName) {
-                    // Implementar lógica para crear una nueva lista de tareas con el nombre proporcionado
+                    fetch('/create_task_list', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ task_list_name: taskListName })
+                    }).then(response => response.json()).then(data => {
+                        if (data.status === 'success') {
+                            alert('Lista de tareas creada con éxito.');
+                            location.reload();
+                        } else {
+                            alert('Error al crear la lista de tareas.');
+                        }
+                    });
+
                 } else {
                     alert('Por favor, ingrese un nombre para la lista de tareas.');
                 }
+            }
+            function loadTaskList(taskListName) {
+                currentTaskListName = taskListName;
+                fetch(`/load_tasks/${taskListName}`).then(response => response.json()).then(data => {
+                    const taskList = document.getElementById('task-list');
+                    taskList.innerHTML = '';
+                    data.tasks.forEach(task => {
+                        const newTask = document.createElement('li');
+                        newTask.innerHTML = `<input type="checkbox" ${task.completed ? 'checked' : ''}> ${task.name} <button onclick="deleteTask(this)">Borrar</button>`;
+                        taskList.appendChild(newTask);
+                    });
+                });
             }
         </script>
     </body>
