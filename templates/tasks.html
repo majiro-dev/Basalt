@@ -57,6 +57,8 @@
                     alert('Por favor, seleccione una lista de tareas.');
                     return;
                 }
+            function addTask() {
+                const taskName = document.getElementById('task-name').value;
                 if (taskName) {
                     const taskList = document.getElementById('task-list');
                     const newTask = document.createElement('li');
@@ -119,11 +121,11 @@
                             alert('Error al crear la lista de tareas.');
                         }
                     });
+
                 } else {
                     alert('Por favor, ingrese un nombre para la lista de tareas.');
                 }
             }
-
             function loadTaskList(taskListName) {
                 currentTaskListName = taskListName;
                 fetch(`/load_tasks/${taskListName}`).then(response => response.json()).then(data => {

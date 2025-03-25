@@ -84,7 +84,20 @@
                 console.error('Error opening file:', error);
             });
         });
-        
 
+    </script>
+
+    <script>
+        const textarea = document.getElementById("textarea")
+        const form = document.getElementById("textform")
+        let timer;
+        const delay = 1000;
+        textarea.addEventListener('input', function() {
+            clearTimeout(timer);//resetea el timer siempre que el usuario digita
+            timer = setTimeout(() => {//función de flecha (sin nombre)
+                form.submit();
+            }, delay); //es realizada a cada timer tiempo
+        
+        })
     </script>
 </html>

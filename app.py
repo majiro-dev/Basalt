@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, jsonify
 import os
 import sys
@@ -43,6 +42,7 @@ def get_text():
 	with open(folder_path + "/" + current_file , "w") as file:
 		file.write(text)
 	return redirect("/")
+
 
 # ****** Tareas ********
 
@@ -123,7 +123,10 @@ def save_tasks(task_list_name, tasks):
 
 # ***********************************************
 
-if __name__ == '__main__':
+
+def init():
+	global folder_path
+	global current_file
 	#get the path from the first argument
 	folder_path = sys.argv[1]
 	# current file is the first file in the folder or if it is empty, create a new file named "new_note.txt"
@@ -134,5 +137,8 @@ if __name__ == '__main__':
 		current_file = "new_note.txt"
 		with open(folder_path + "/" + current_file , "w") as file:
 			file.write("")
+
+if __name__ == '__main__':
+	init()
 	app.run(debug=True)
 
