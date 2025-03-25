@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<title>Basalt - Tareas</title>
+</head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <h1 class="navbar-brand" href="#">Basalt</h1>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Notas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/tasks">Tareas</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container-fluid">
+            <div class="row">
+            <div id="sidebar" class="col-md-3 bg-light vh-100 p-3">
+                <h2>Tareas</h2>
+                <input type="text" id="task-list-name" class="form-control mt-2" placeholder="Nombre de la lista de tareas">
+                <button onclick="createTaskList()">Crear Lista de Tareas</button>
+                <ul id="task-list-selector" class="list-group mt-2">
+                    {% for list_name in task_lists %}
+                    <li class="list-group-item" onclick="loadTaskList('{{ list_name }}')">{{ list_name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="editor" class="col-md-9 vh-100 p-3">
+                <h2>Editor de Tareas</h2>
+                <input type="text" id="task-name" class="form-control mt-2" placeholder="Nombre de la tarea">
+                <button onclick="addTask()">Añadir Tarea</button>
+                <ul class="list-unstyled" id="task-list">
+                    {% for task in tasks %}
+                    <li>
+                        <input type="checkbox" {% if task.completed %}checked{% endif %} onclick="toggleTask('{{ task.id }}')">
+                        {{ task.name }}
+                        <button onclick="deleteTask('{{ task.id }}')">Borrar</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <button class="btn btn-primary mt-2 float-right" onclick="saveTasks()">Guardar Cambios</button>
+            </div>
+            </div>
+        </div>
+        <script>
+            let currentTaskListName = '';
+
+            function addTask() {
+                const taskName = document.getElementById('task-name').value;
+                if (!currentTaskListName) {
+                    alert('Por favor, seleccione una lista de tareas.');
+                    return;
+                }
+                if (taskName) {
+                    const taskList = document.getElementById('task-list');
+                    const newTask = document.createElement('li');
+                    newTask.innerHTML = `<input type="checkbox"> ${taskName} <button onclick="deleteTask(this)">Borrar</button>`;
+                    taskList.appendChild(newTask);
+                    document.getElementById('task-name').value = ''; // Clear the input field
+                } else {
+                    alert('Por favor, ingrese un nombre para la tarea.');
+                }
+            }
+
+            function deleteTask(taskId) {
+                // Implementar lógica para borrar tarea
+            }
+
+            function toggleTask(taskId) {
+                // Implementar lógica para marcar tarea como completada
+            }
+
+            function saveTasks() {
+                if (!currentTaskListName) {
+                    alert('Por favor, seleccione una lista de tareas.');
+                    return;
+                }
+                const tasks = [];
+                document.querySelectorAll('#task-list li').forEach((li, index) => {
+                    const taskName = li.textContent.replace('Borrar', '').trim();
+                    const completed = li.querySelector('input[type="checkbox"]').checked;
+                    tasks.push({ id: index + 1, name: taskName, completed: completed });
+                });
+                fetch(`/save_tasks/${currentTaskListName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ tasks: tasks })
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 'success') {
+                        alert('Tareas guardadas con éxito.');
+                    } else {
+                        alert('Error al guardar las tareas.');
+                    }
+                });
+            }
+
+            function createTaskList() {
+                const taskListName = document.getElementById('task-list-name').value;
+                if (taskListName) {
+                    fetch('/create_task_list', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ task_list_name: taskListName })
+                    }).then(response => response.json()).then(data => {
+                        if (data.status === 'success') {
+                            alert('Lista de tareas creada con éxito.');
+                            location.reload();
+                        } else {
+                            alert('Error al crear la lista de tareas.');
+                        }
+                    });
+                } else {
+                    alert('Por favor, ingrese un nombre para la lista de tareas.');
+                }
+            }
+
+            function loadTaskList(taskListName) {
+                currentTaskListName = taskListName;
+                fetch(`/load_tasks/${taskListName}`).then(response => response.json()).then(data => {
+                    const taskList = document.getElementById('task-list');
+                    taskList.innerHTML = '';
+                    data.tasks.forEach(task => {
+                        const newTask = document.createElement('li');
+                        newTask.innerHTML = `<input type="checkbox" ${task.completed ? 'checked' : ''}> ${task.name} <button onclick="deleteTask(this)">Borrar</button>`;
+                        taskList.appendChild(newTask);
+                    });
+                });
+            }
+        </script>
+    </body>
+</html>
