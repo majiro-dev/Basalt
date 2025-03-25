@@ -20,8 +20,11 @@
                 </ul>
             </div>
             <div id="editor" class="col-md-9 vh-100 p-3">
-                <h2>Editor</h2>
-                <textarea class="form-control" rows="20" placeholder="Start writing..."></textarea>
+                <h2>Editing file: {{name}} </h2>
+            <form action="/getText" method="post">
+                <button type="submit" class="btn btn-primary me-md-2"> Guardar</button>
+                <textarea name="text"  class="form-control" rows="20" placeholder="Start writing...">{{ content }}</textarea>
+            </form>
             </div>
             </div>
         </div>
