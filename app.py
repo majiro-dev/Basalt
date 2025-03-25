@@ -43,7 +43,9 @@ def get_text():
 		file.write(text)
 	return redirect("/")
 
-if __name__ == '__main__':
+def init():
+	global folder_path
+	global current_file
 	#get the path from the first argument
 	folder_path = sys.argv[1]
 	# current file is the first file in the folder or if it is empty, create a new file named "new_note.txt"
