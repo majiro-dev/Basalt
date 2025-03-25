@@ -54,5 +54,27 @@
         .catch(error => {
             console.error('Error fetching files:', error);
         });
+
+        // event listener handler for each note link to /open_file
+        document.getElementById('notes_list').addEventListener('click', (event) => {
+            event.preventDefault();
+            let note = event.target.innerText;
+            fetch(`/open_file?file=${note}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                window.localtion.reload();
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('editor').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error opening file:', error);
+            });
+        });
+        
+
     </script>
 </html>
