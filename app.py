@@ -58,6 +58,7 @@ def init():
 		with open(folder_path + "/" + current_file , "w") as file:
 			file.write("")
 
+
 if __name__ == '__main__':
 	init()
 	app.run(debug=True)
