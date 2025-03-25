@@ -13,7 +13,7 @@
             <div class="row">
             <div id="sidebar" class="col-md-3 bg-light vh-100 p-3">
                 <h2>Notes</h2>
-                <ul class="list-unstyled">
+                <ul id = "notes_list" class="list-unstyled">
                 <li><a href="#">Note 1</a></li>
                 <li><a href="#">Note 2</a></li>
                 <li><a href="#">Note 3</a></li>
@@ -29,4 +29,30 @@
             </div>
         </div>
     </body>
+
+    <script>
+        // populate the notes_list with links to the files found in the folder path
+        fetch('/get_files')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            let notes_list = document.getElementById('notes_list');
+            notes_list.innerHTML = '';
+            data.forEach(file => {
+                let li = document.createElement('li');
+                let a = document.createElement('a');
+                a.href = '#';
+                a.innerText = file;
+                li.appendChild(a);
+                notes_list.appendChild(li);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching files:', error);
+        });
+    </script>
 </html>
