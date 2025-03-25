@@ -7,9 +7,9 @@ app = Flask(__name__)
 folder_path = ''
 
 @app.route('/')
-def insertar_formulario(i):
+def insertar_formulario():
 	try:
-		with open("t ", "r") as file:
+		with open("input1.txt ", "r") as file:
 			content = file.read()
 			name = file.name
 	except FileNotFoundError:
