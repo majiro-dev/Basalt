@@ -134,4 +134,5 @@ if __name__ == '__main__':
 		current_file = "new_note.txt"
 		with open(folder_path + "/" + current_file , "w") as file:
 			file.write("")
+	app.run(debug=True)
 
