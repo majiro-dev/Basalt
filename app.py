@@ -9,7 +9,7 @@ folder_path = ''
 @app.route('/')
 def insertar_formulario():
 	try:
-		with open("t ", "r") as file:
+		with open("vault/input1.txt", "r") as file:
 			content = file.read()
 			name = file.name
 	except FileNotFoundError:
@@ -32,7 +32,7 @@ def get_files():
 def get_text():
 	text = request.form.get("text", "")
 	text = text.replace("\n", "")
-	with open("input1.txt", "w") as file:
+	with open("vault/input1.txt", "w") as file:
 		file.write(text)
 	return redirect("/")
 

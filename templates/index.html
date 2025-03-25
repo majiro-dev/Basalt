@@ -21,9 +21,9 @@
             </div>
             <div id="editor" class="col-md-9 vh-100 p-3">
                 <h2>Editing file: {{name}} </h2>
-            <form action="/getText" method="post">
+            <form id="textform" action="/getText" method="post">
                 <button type="submit" class="btn btn-primary me-md-2"> Guardar</button>
-                <textarea name="text"  class="form-control" rows="20" placeholder="Start writing...">{{ content }}</textarea>
+                <textarea name="text" id="textarea"  class="form-control" rows="20" placeholder="Start writing...">{{ content }}</textarea>
             </form>
             </div>
             </div>
@@ -54,5 +54,18 @@
         .catch(error => {
             console.error('Error fetching files:', error);
         });
+    </script>
+    <script>
+        const textarea = document.getElementById("textarea")
+        const form = document.getElementById("textform")
+        let timer;
+        const delay = 1000;
+        textarea.addEventListener('input', function() {
+            clearTimeout(timer);//resetea el timer siempre que el usuario digita
+            timer = setTimeout(() => {//función de flecha (sin nombre)
+                form.submit();
+            }, delay); //es realizada a cada timer tiempo
+
+        })
     </script>
 </html>
