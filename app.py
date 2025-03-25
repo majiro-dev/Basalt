@@ -4,13 +4,14 @@ from flask import Flask, render_template, request, redirect
 app = Flask(__name__)
 
 @app.route('/')
-def insertar_formulario(i):
+def insertar_formulario():
 	try:
-		with open("t ", "r") as file:
+		with open("input1.txt", "r") as file:
 			content = file.read()
 			name = file.name
 	except FileNotFoundError:
 		content = ""
+		name = ""
     
 	return render_template('index.html', content=content, name=name)
 
@@ -28,7 +29,6 @@ def get_text():
 	text = text.replace("\n", "")
 	with open("input1.txt", "w") as file:
 		file.write(text)
-	#print(f"Texto recebido: {text}")
 	return redirect("/")
 
 if __name__ == '__main__':
