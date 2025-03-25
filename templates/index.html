@@ -64,7 +64,7 @@
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                window.localtion.reload();
+                window.location.reload();
                 return response.json();
             })
             .then(data => {
