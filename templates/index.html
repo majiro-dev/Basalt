@@ -23,10 +23,13 @@
             <div class="row">
             <div id="sidebar" class="col-md-3 bg-light vh-100 p-3">
                 <h2>Notes</h2>
+                <form action="/select_folder" method="POST" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" name="folder_path" class="form-control" placeholder="Enter folder path" required>
+                        <button type="submit" class="btn btn-secondary ">Select Folder</button>
+                    </div>
+                </form>
                 <ul id = "notes_list" class="list-unstyled">
-                <li><a href="#">Note 1</a></li>
-                <li><a href="#">Note 2</a></li>
-                <li><a href="#">Note 3</a></li>
                 </ul>
             </div>
             <div id="editor" class="col-md-9 vh-100 p-3">
