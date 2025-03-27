@@ -64,15 +64,10 @@ def get_file():
 @app.route("/getText", methods=['POST'])
 def get_text():
     text = request.form.get("text", "")
-    text = text.replace("\n", "")
 
     with open(folder_path + "/" + current_file , "w") as file:
-        file.write(text)
+        file.write(html_to_markdown(text))
     return redirect("/")
-	text = request.form.get("text", "")
-	with open(folder_path + "/" + current_file , "w") as file:
-		file.write(html_to_markdown(text))
-	return redirect("/")
 
 @app.route('/select_folder', methods=['POST'])
 def select_folder():
