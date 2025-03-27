@@ -6,28 +6,33 @@ import json
 app = Flask(__name__)
 folder_path = ''
 current_file = ''
+message = ''
 
 @app.route('/')
 def insertar_formulario():
+    global folder_path
     content = "No file"
+    path = ''
     name = "No file"
     if folder_path and os.path.exists(folder_path):
         file_path = os.path.join(folder_path, current_file)
-        if os.path.exists(file_path):
+        path = folder_path
+        if current_file and os.path.exists(file_path):
             try:
                 with open(folder_path + "/" + current_file , "r") as file:
                     content = file.read()
-                    name = file.name
+                    name = current_file
             except FileNotFoundError:
                 content = "No file"
                 name = "No file"
-    return render_template('index.html', content=content, name=name)
+    else:
+        path = folder_path + " no such folder"
+    return render_template('index.html', content=content, name=name, message=message, path=path)
 
 @app.route('/open_file', methods=['GET'])
 def open_file():
 	global current_file
 	current_file = request.args.get("file")
-	print(current_file + " opened")
 	return redirect("/")
 
 # return the file paths from the files in the folder
@@ -40,23 +45,38 @@ def get_files():
 	return files
 
 
+@app.route("/getFile", methods=['POST'])
+def get_file():
+    global current_file
+    current_file = request.form.get("filename", "")
+    if not current_file.endswith(".txt"):
+        current_file += ".txt"
+
+    with open(folder_path + "/" + current_file , "w") as file:
+        file.write("")
+    return redirect("/")
+
 @app.route("/getText", methods=['POST'])
 def get_text():
-	text = request.form.get("text", "")
-	text = text.replace("\n", "")
-	with open(folder_path + "/" + current_file , "w") as file:
-		file.write(text)
-	return redirect("/")
+    text = request.form.get("text", "")
+    text = text.replace("\n", "")
+
+    with open(folder_path + "/" + current_file , "w") as file:
+        file.write(text)
+    return redirect("/")
 
 @app.route('/select_folder', methods=['POST'])
 def select_folder():
     global folder_path
+    global message
     
     folder_path = request.form.get('folder_path', '')
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        message = "Insert a folder"
         return redirect('/')
     else:
-        return "Invalid folder path. Please try again", 404
+        message = "Error: no folder"
+        return redirect('/')
         
 
 # ****** Tareas ********
@@ -142,12 +162,10 @@ def save_tasks(task_list_name, tasks):
 def init():
     global folder_path
     global current_file
+    global message
+    message = "Insert a folder"
     folder_path = ""
-    current_file = "new_note.txt"
-
-    if folder_path and os.path.exists(folder_path):
-        with open(folder_path + "/" + current_file , "w") as file:
-           file.write("")
+    current_file = ""
 
 if __name__ == '__main__':
 	init()
