@@ -32,13 +32,16 @@
                 <ul id = "notes_list" class="list-unstyled">
                 </ul>
             </div>
-            <div id="editor" class="col-md-9 vh-100 p-3">
-                <h2>Editing file: {{name}} </h2>
-            <form id="textform" action="/getText" method="post">
-                <button type="submit" class="btn btn-primary me-md-2"> Guardar</button>
-                <textarea name="text" id="textarea"  class="form-control" rows="20" placeholder="Start writing...">{{ content }}</textarea>
-            </form>
-            </div>
+                <div id="editor" class="col-md-9 vh-100 p-3">
+                    <h2>Editing file: {{name}} </h2>
+                    <form id="textform" action="/getText" method="post">
+                        <button type="submit" class="btn btn-primary me-md-2">Guardar</button>
+                        <div id="textarea" class="form-control" contenteditable="true" style="height: 400px; overflow-y: auto;">
+                            {{ content|safe }}
+                        </div>
+                        <input type="hidden" name="text" id="hiddenTextarea">
+                    </form>
+                </div>
             </div>
         </div>
     </body>
@@ -88,16 +91,118 @@
             });
         });
 
-        const textarea = document.getElementById("textarea")
-        const form = document.getElementById("textform")
-        let timer;
-        const delay = 1000;
-        textarea.addEventListener('input', function() {
-            clearTimeout(timer);//resetea el timer siempre que el usuario digita
-            timer = setTimeout(() => {//función de flecha (sin nombre)
-                form.submit();
-            }, delay); //es realizada a cada timer tiempo
+        function linkify() {
+        const textarea = document.getElementById("textarea");
+        const content = textarea.innerText; // Get plain text content
+        const updatedContent = content.replace(/\[\[(.*?)\]\]/g, (match, p1) => {
+            const fileName = p1.trim();
+            return `<a href="/open_file?file=${encodeURIComponent(fileName)}" target="_blank">${fileName}</a>`;
+        });
+        textarea.innerHTML = updatedContent; // Set HTML content with links
+        }
 
-        })
+        const textarea = document.getElementById("textarea");
+        const form = document.getElementById("textform");
+        const hiddenTextarea = document.getElementById("hiddenTextarea");
+        let timer;
+        const delay = 2000;
+
+        textarea.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const savedSel = saveSelection(textarea);
+                // Save the updated content to the hidden input for form submission
+                hiddenTextarea.value = textarea.innerHTML;
+                form.requestSubmit();
+                linkify();
+                textarea.focus();
+                restoreSelection(textarea, savedSel);
+            }, delay);
+        });
+
+        // Ensure the hidden input is updated before form submission
+        form.addEventListener('submit', function () {
+            hiddenTextarea.value = textarea.innerHTML;
+        });
+
+        // Make links inside the contenteditable div clickable
+        textarea.addEventListener('click', function (event) {
+            const target = event.target;
+            if (target.tagName === 'A') {
+                event.preventDefault(); // Prevent the default link behavior
+                const href = target.getAttribute('href');
+                if (href) {
+                    window.open(href, '_blank'); // Open the link in a new tab
+                }
+            }
+        });
+
+        function saveSelection(containerEl) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const preSelectionRange = range.cloneRange();
+            preSelectionRange.selectNodeContents(containerEl);
+            preSelectionRange.setEnd(range.startContainer, range.startOffset);
+            const start = preSelectionRange.toString().length;
+
+            return {
+                start: start,
+                end: start + range.toString().length
+            };
+        }
+        return null;
+    }
+
+    function saveSelection(containerEl) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const preSelectionRange = range.cloneRange();
+            preSelectionRange.selectNodeContents(containerEl);
+            preSelectionRange.setEnd(range.startContainer, range.startOffset);
+            const start = preSelectionRange.toString().length;
+
+            return {
+                start: start,
+                end: start + range.toString().length
+            };
+        }
+        return null;
+    }
+
+    function restoreSelection(containerEl, savedSel) {
+        if (!savedSel) return;
+        const charIndex = { count: 0 };
+        const range = document.createRange();
+        range.setStart(containerEl, 0);
+        range.collapse(true);
+
+        function traverseNodes(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const textLength = node.textContent.length;
+                if (charIndex.count + textLength >= savedSel.start) {
+                    range.setStart(node, savedSel.start - charIndex.count);
+                }
+                if (charIndex.count + textLength >= savedSel.end) {
+                    range.setEnd(node, savedSel.end - charIndex.count);
+                    return true;
+                }
+                charIndex.count += textLength;
+            } else {
+                for (let i = 0; i < node.childNodes.length; i++) {
+                    if (traverseNodes(node.childNodes[i])) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        traverseNodes(containerEl);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
     </script>
 </html>

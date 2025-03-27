@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, jsonify
 import os
 import sys
 import json
+import markdown
+import markdownify
 
 app = Flask(__name__)
 folder_path = ''
@@ -17,6 +19,9 @@ def insertar_formulario():
             try:
                 with open(folder_path + "/" + current_file , "r") as file:
                     content = file.read()
+                    content = markdown_to_html(content)
+                    content = readd_links(content)
+                    print(content)
                     name = file.name
             except FileNotFoundError:
                 content = "No file"
@@ -39,13 +44,12 @@ def get_files():
 			files.append(file)
 	return files
 
-
+#saves the text in the file
 @app.route("/getText", methods=['POST'])
 def get_text():
 	text = request.form.get("text", "")
-	text = text.replace("\n", "")
 	with open(folder_path + "/" + current_file , "w") as file:
-		file.write(text)
+		file.write(html_to_markdown(text))
 	return redirect("/")
 
 @app.route('/select_folder', methods=['POST'])
@@ -138,6 +142,20 @@ def save_tasks(task_list_name, tasks):
 
 # ***********************************************
 
+
+# replace text with this format &nbsp;<a href="/open_file?file=b" target="b">b</a> to [[b]]
+# to [[b]]
+def replace_links(text):
+    return text.replace("&nbsp;<a href=\"/open_file?file=", "[[").replace("\" target=\"_blank\">", "]]")
+
+def readd_links(text):
+    return text.replace("[[", "&nbsp;<a href=\"/open_file?file=").replace("]]", "\" target=\"_blank\">")
+
+def markdown_to_html(text):
+    return markdown.markdown(text)
+
+def html_to_markdown(text):
+    return markdownify.markdownify(text)
 
 def init():
     global folder_path
