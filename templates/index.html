@@ -25,17 +25,24 @@
                 <h2>Notes</h2>
                 <form action="/select_folder" method="POST" class="mb-3">
                     <div class="input-group">
-                        <input type="text" name="folder_path" class="form-control" placeholder="Enter folder path" required>
+                        <input type="text" name="folder_path" class="form-control" placeholder="{{message}}" required>
                         <button type="submit" class="btn btn-secondary ">Select Folder</button>
                     </div>
+                <h4> Folder: {{path}} </h4>
                 </form>
                 <ul id = "notes_list" class="list-unstyled">
                 </ul>
             </div>
                 <div id="editor" class="col-md-9 vh-100 p-3">
-                    <h2>Editing file: {{name}} </h2>
-                    <form id="textform" action="/getText" method="post">
-                        <button type="submit" class="btn btn-primary me-md-2">Guardar</button>
+                <h2> Editing file: {{name}} </h2> 
+                    <form class="form-inline" id="fileForm" action="/getFile" method="post"> 
+                <div class="form-group mx-sm-3 mb-2">
+                    <input type="text" name="filename" class="form-control" placeholder="Enter file name" required>
+                </div>    
+                <button type="submit" class="btn btn-primary mb-2"> Save</button>
+            </form>  
+            <form  class="form" id="textform" action="/getText" method="post">
+                        <button type="submit" class="btn btn-primary me-md-2">Save</button>
                         <div id="textarea" class="form-control" contenteditable="true" style="height: 400px; overflow-y: auto;">
                             {{ content|safe }}
                         </div>
@@ -46,7 +53,7 @@
         </div>
     </body>
 
-    <script>
+    <script>    
         // populate the notes_list with links to the files found in the folder path
         fetch('/get_files')
         .then(response => {
