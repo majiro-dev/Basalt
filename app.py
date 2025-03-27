@@ -9,14 +9,19 @@ current_file = ''
 
 @app.route('/')
 def insertar_formulario():
-	try:
-		with open(folder_path + "/" + current_file , "r") as file:
-			content = file.read()
-			name = file.name
-	except FileNotFoundError:
-		content = ""
-		name = ""
-	return render_template('index.html', content=content, name=name)
+    content = "No file"
+    name = "No file"
+    if folder_path and os.path.exists(folder_path):
+        file_path = os.path.join(folder_path, current_file)
+        if os.path.exists(file_path):
+            try:
+                with open(folder_path + "/" + current_file , "r") as file:
+                    content = file.read()
+                    name = file.name
+            except FileNotFoundError:
+                content = "No file"
+                name = "No file"
+    return render_template('index.html', content=content, name=name)
 
 @app.route('/open_file', methods=['GET'])
 def open_file():
@@ -43,6 +48,16 @@ def get_text():
 		file.write(text)
 	return redirect("/")
 
+@app.route('/select_folder', methods=['POST'])
+def select_folder():
+    global folder_path
+    
+    folder_path = request.form.get('folder_path', '')
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        return redirect('/')
+    else:
+        return "Invalid folder path. Please try again", 404
+        
 
 # ****** Tareas ********
 
@@ -125,18 +140,14 @@ def save_tasks(task_list_name, tasks):
 
 
 def init():
-	global folder_path
-	global current_file
-	#get the path from the first argument
-	folder_path = sys.argv[1]
-	# current file is the first file in the folder or if it is empty, create a new file named "new_note.txt"
-	files = os.listdir(folder_path)
-	if len(files) > 0:
-		current_file = files[0]
-	else:
-		current_file = "new_note.txt"
-		with open(folder_path + "/" + current_file , "w") as file:
-			file.write("")
+    global folder_path
+    global current_file
+    folder_path = ""
+    current_file = "new_note.txt"
+
+    if folder_path and os.path.exists(folder_path):
+        with open(folder_path + "/" + current_file , "w") as file:
+           file.write("")
 
 
 if __name__ == '__main__':
