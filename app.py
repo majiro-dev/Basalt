@@ -159,7 +159,15 @@ def save_tasks(task_list_name, tasks):
     with open(f'task_lists/{task_list_name}.json', 'w') as f:
         json.dump(tasks, f)
 
-
+@app.route('/delete_task_list/<task_list_name>', methods=['DELETE'])
+def delete_task_list(task_list_name):
+    file_path = f'task_lists/{task_list_name}.json'
+    if os.path.exists(file_path):
+        os.remove(file_path)  # Elimina el archivo de la lista de tareas
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Lista no encontrada'}), 404
+        
 # ***********************************************
 
 
