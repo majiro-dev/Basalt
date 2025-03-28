@@ -4,6 +4,7 @@ import sys
 import json
 import markdown
 import markdownify
+import re
 
 app = Flask(__name__)
 folder_path = ''
@@ -50,13 +51,20 @@ def get_files():
 	return files
 
 #saves the text in the file
+@app.route("/getName", methods=['POST'])
+def get_name():
+    global current_file
+    name = request.form.get("newname", "")
+    print(f"hola {name}")
+    if (current_file != name):
+        os.rename(os.path.join(folder_path, current_file), os.path.join(folder_path, name))
+        current_file = name
+    return redirect("/")
+
 @app.route("/getFile", methods=['POST'])
 def get_file():
     global current_file
     current_file = request.form.get("filename", "")
-    if not current_file.endswith(".txt"):
-        current_file += ".txt"
-
     with open(folder_path + "/" + current_file , "w") as file:
         file.write("")
     return redirect("/")
@@ -64,9 +72,10 @@ def get_file():
 @app.route("/getText", methods=['POST'])
 def get_text():
     text = request.form.get("text", "")
-
+    text = replace_links(text)
+    text = html_to_markdown(text)
     with open(folder_path + "/" + current_file , "w") as file:
-        file.write(html_to_markdown(text))
+        file.write(text)
     return redirect("/")
 
 @app.route('/select_folder', methods=['POST'])
@@ -174,10 +183,13 @@ def delete_task_list(task_list_name):
 # replace text with this format &nbsp;<a href="/open_file?file=b" target="b">b</a> to [[b]]
 # to [[b]]
 def replace_links(text):
-    return text.replace("&nbsp;<a href=\"/open_file?file=", "[[").replace("\" target=\"_blank\">", "]]")
+    return text.replace("<a href=\"/open_file?file=", "[[").replace("\" target=\"_blank\">", "]]")
 
 def readd_links(text):
-    return text.replace("[[", "&nbsp;<a href=\"/open_file?file=").replace("]]", "\" target=\"_blank\">")
+    def replace_match(match):
+        file_name = match.group(1)
+        return f'<a href="/open_file?file={file_name}" target="_blank">{file_name}</a>'
+    return re.sub(r'\[\[(.*?)\]\]', replace_match, text)
 
 def markdown_to_html(text):
     return markdown.markdown(text)
