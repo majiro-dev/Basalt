@@ -42,11 +42,11 @@
                 <button type="submit" class="btn btn-primary mb-2"> Save</button>
             </form>  
             <form  class="form" id="textform" action="/getText" method="post">
-                        <button type="submit" class="btn btn-primary me-md-2">Save</button>
                         <div id="textarea" class="form-control" contenteditable="true" style="height: 400px; overflow-y: auto;">
                             {{ content|safe }}
                         </div>
                         <input type="hidden" name="text" id="hiddenTextarea">
+                        <button type="submit" class="btn btn-primary me-md-2">Save</button>
                     </form>
                 </div>
             </div>
