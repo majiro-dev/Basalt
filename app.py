@@ -51,13 +51,20 @@ def get_files():
 	return files
 
 #saves the text in the file
+@app.route("/getName", methods=['POST'])
+def get_name():
+    global current_file
+    name = request.form.get("newname", "")
+    print(f"hola {name}")
+    if (current_file != name):
+        os.rename(os.path.join(folder_path, current_file), os.path.join(folder_path, name))
+        current_file = name
+    return redirect("/")
+
 @app.route("/getFile", methods=['POST'])
 def get_file():
     global current_file
     current_file = request.form.get("filename", "")
-    if not current_file.endswith(".txt"):
-        current_file += ".txt"
-
     with open(folder_path + "/" + current_file , "w") as file:
         file.write("")
     return redirect("/")
