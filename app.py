@@ -25,11 +25,19 @@ def insertar_formulario():
                 with open(folder_path + "/" + current_file , "r") as file:
                     content = file.read()
                     content = markdown_to_html(content)
+                    content = readd_links(content)
                     #print(content)
                     name = current_file
             except FileNotFoundError:
                 content = "No file"
                 name = "No file"
+        elif current_file != "":
+            #create the file if it does not exist
+            with open(folder_path + "/" + current_file , "w") as file:
+                file.write("")
+                content = ""
+                name = current_file
+
     else:
         path = folder_path + " no such folder"
     return render_template('index.html', content=content, name=name, message=message, path=path)
