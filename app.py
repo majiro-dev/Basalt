@@ -191,7 +191,14 @@ def delete_task_list(task_list_name):
 # replace text with this format &nbsp;<a href="/open_file?file=b" target="b">b</a> to [[b]]
 # to [[b]]
 def replace_links(text):
-    return text.replace("<a href=\"/open_file?file=", "[[").replace("\" target=\"_blank\">", "]]")
+    return re.sub(r'<a href="/open_file\?file=(.*?)">.*?</a>', r'[[\1]]', text)
+
+## replace [[b]] with <a href="/open_file?file=b">b</a>
+def readd_links(text):
+    matches = re.findall(r'\[\[(.*?)\]\]', text)
+    for match in matches:
+       text = text.replace("[[" + match + "]]", "<a href=\"/open_file?file=" + match + "\">" + match + "</a>")
+    return text
 
 def markdown_to_html(text):
     return markdown.markdown(text)
