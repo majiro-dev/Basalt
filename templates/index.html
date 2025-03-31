@@ -42,7 +42,7 @@
                     <form class="form-inline" id="fileForm" action="/getFile" method="post"> 
                 <div class="form-group mx-sm-3 mb-2">
                     <input type="text" name="filename" class="form-control" placeholder="Enter file name" required>
-                    <button type="submit" class="btn btn-secondary"> Save</button>
+                    <button type="submit" class="btn btn-secondary"> Submit</button>
                 </div>    
             </form>  
             <form  class="form" id="textform" action="/getText" method="post">
@@ -116,7 +116,7 @@
         const form = document.getElementById("textform");
         const hiddenTextarea = document.getElementById("hiddenTextarea");
         let timer;
-        const delay = 2000;
+        const delay = 3000;
 
         textarea.addEventListener('input', function () {
             clearTimeout(timer);
@@ -145,19 +145,5 @@
             }
             }
         });
-
-    const newNameElement = document.getElementById('newname');
-    const hiddenNewNameInput = document.getElementById('hiddenNewName');
-    const formName = newNameElement.closest('form');
-
-    // Atualiza o campo oculto sempre que o conteúdo do elemento contenteditable mudar
-    newNameElement.addEventListener('input', () => {
-        hiddenNewNameInput.value = newNameElement.innerText;
-    });
-
-    // Garante que o valor atualizado seja enviado ao submeter o formulário
-    formName.addEventListener('submit', () => {
-        hiddenNewNameInput.value = newNameElement.innerText;
-    });
     </script>
 </html>
