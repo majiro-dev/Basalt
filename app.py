@@ -35,6 +35,7 @@ def insertar_formulario():
         path = folder_path + " no such folder"
     return render_template('index.html', content=content, name=name, message=message, path=path)
 
+#abre un archivo
 @app.route('/open_file', methods=['GET'])
 def open_file():
 	global current_file
@@ -50,25 +51,31 @@ def get_files():
 			files.append(file)
 	return files
 
-#saves the text in the file
-@app.route("/getName", methods=['POST'])
-def get_name():
+#rename the file
+@app.route("/rename", methods=['POST'])
+def rename_file():
     global current_file
     name = request.form.get("newname", "")
-    print(f"hola {name}")
-    if (current_file != name):
+    if (current_file != name and not os.path.exists((os.path.join(folder_path, name)))):
         os.rename(os.path.join(folder_path, current_file), os.path.join(folder_path, name))
         current_file = name
     return redirect("/")
 
+#crea un archivo o abre uno que existe
 @app.route("/getFile", methods=['POST'])
 def get_file():
     global current_file
-    current_file = request.form.get("filename", "")
-    with open(folder_path + "/" + current_file , "w") as file:
-        file.write("")
+
+    name = request.form.get("filename", "")
+    if os.path.exists((os.path.join(folder_path, name))):
+        current_file = name
+    else:    
+        with open(folder_path + "/" + current_file , "w") as file:
+            current_file = name
+            file.write("")
     return redirect("/")
 
+#guarda el texto en un archivo
 @app.route("/getText", methods=['POST'])
 def get_text():
     text = request.form.get("text", "")
@@ -78,6 +85,7 @@ def get_text():
         file.write(text)
     return redirect("/")
 
+#seleciona una carpeta
 @app.route('/select_folder', methods=['POST'])
 def select_folder():
     global folder_path
