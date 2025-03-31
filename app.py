@@ -76,7 +76,7 @@ def get_file():
     name = request.form.get("filename", "")
     if os.path.exists((os.path.join(folder_path, name))):
         current_file = name
-    else:    
+    elif current_file != "":    
         with open(folder_path + "/" + current_file , "w") as file:
             current_file = name
             file.write("")
