@@ -24,7 +24,7 @@
             <div id="sidebar" class="col-md-3 bg-light vh-100 p-3">
                 <h2>Notes</h2>
                 <form class="form-inline" action="/select_folder" method="POST" class="mb-3">
-                    <div class="input-group">
+                    <div class="input-group" class="form-group mx-sm-3 mb-2">
                         <input type="text" name="folder_path" class="form-control" placeholder="{{message}}" required>
                         <button type="submit" class="btn btn-secondary ">Select Folder</button>
                     </div>
@@ -35,23 +35,22 @@
             </div>
                 <div id="editor" class="col-md-9 vh-100 p-3">
                     <form class="form-inline" action="/rename" method="post">
-                        <input type="text" name="newname" id="newname">
-                        <button  type="submit"> Change name </button>
+                        <input type="text" name="newname" id="newname" class="form-control" placeholder="Rename file">
+                        <button class="btn btn-secondary " type="submit"> Change name </button>
                     </form>
                 <h2> {{name}} </h2> 
                     <form class="form-inline" id="fileForm" action="/getFile" method="post"> 
                 <div class="form-group mx-sm-3 mb-2">
-
                     <input type="text" name="filename" class="form-control" placeholder="Enter file name" required>
+                    <button type="submit" class="btn btn-secondary"> Save</button>
                 </div>    
-                <button type="submit" class="btn btn-primary mb-2"> Save</button>
             </form>  
             <form  class="form" id="textform" action="/getText" method="post">
                         <div id="textarea" class="form-control" contenteditable="true" style="height: 400px; overflow-y: auto;">
                             {{ content|safe }}
                         </div>
                         <input type="hidden" name="text" id="hiddenTextarea">
-                        <button type="submit" class="btn btn-primary me-md-2">Save</button>
+                        <button type="submit" class="btn btn-secondary ">Save</button>
                     </form>
                 </div>
             </div>

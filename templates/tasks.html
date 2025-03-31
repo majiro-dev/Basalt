@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Basalt - Tareas</title>
+    <title>Basalt - Tasks</title>
     <style>
         .text-decoration-line-through {
             text-decoration: line-through;
@@ -47,7 +47,7 @@
             <div id="sidebar" class="col-md-3 bg-light vh-100 p-3">
                 <h2>Tasks</h2>
                 <input type="text" id="task-list-name" class="form-control mt-2" placeholder="Task list name">
-                <button class="btn btn-primary mt-2" onclick="createTaskList()">Create a new task list</button>
+                <button class="btn btn-secondary " onclick="createTaskList()">Create a new task list</button>
                 <ul id="task-list-selector" class="list-group mt-2">
                     {% for list_name in task_lists %}
                     <li class="list-group-item" onclick="loadTaskList('{{ list_name }}')">{{ list_name }}</li>
@@ -63,11 +63,11 @@
                 </div>
                 <div id="task-controls">
                     <input type="text" id="task-name" class="form-control mt-2" placeholder="Tasks name">
-                    <button class="btn btn-primary mt-2" onclick="addTask()">Create task</button>
+                    <button class="btn btn-secondary " onclick="addTask()">Create task</button>
                     <ul class="list-unstyled" id="task-list">
                         <!-- Las tareas se generarán dinámicamente aquí -->
                     </ul>
-                    <button class="btn btn-primary mt-2 float-right" onclick="saveTasks()">Save</button>
+                    <button class="btn btn-secondary     float-right" onclick="saveTasks()">Save</button>
                 </div>
             </div>
             </div>
