@@ -34,10 +34,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Notas</a>
+                        <a class="nav-link" href="/">Notes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/tasks">Tareas</a>
+                        <a class="nav-link" href="/tasks">Tasks</a>
                     </li>
                 </ul>
             </div>
@@ -45,9 +45,9 @@
         <div class="container-fluid">
             <div class="row">
             <div id="sidebar" class="col-md-3 bg-light vh-100 p-3">
-                <h2>Tareas</h2>
-                <input type="text" id="task-list-name" class="form-control mt-2" placeholder="Nombre de la lista de tareas">
-                <button class="btn btn-primary mt-2" onclick="createTaskList()">Crear Lista de Tareas</button>
+                <h2>Tasks</h2>
+                <input type="text" id="task-list-name" class="form-control mt-2" placeholder="Task list name">
+                <button class="btn btn-primary mt-2" onclick="createTaskList()">Create a new task list</button>
                 <ul id="task-list-selector" class="list-group mt-2">
                     {% for list_name in task_lists %}
                     <li class="list-group-item" onclick="loadTaskList('{{ list_name }}')">{{ list_name }}</li>
@@ -56,18 +56,18 @@
             </div>
             <div id="editor" class="col-md-9 vh-100 p-3">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 id="task-list-title">Lista de tareas: Ninguna seleccionada</h2>
+                    <h2 id="task-list-title">Task list: none selected</h2>
                     <button id="delete-task-list-btn" class="btn btn-sm btn-danger" onclick="deleteCurrentTaskList()" style="display: none;">
-                        Borrar lista de tareas
+                       Remove task list
                     </button>
                 </div>
                 <div id="task-controls">
-                    <input type="text" id="task-name" class="form-control mt-2" placeholder="Nombre de la tarea">
-                    <button class="btn btn-primary mt-2" onclick="addTask()">Añadir Tarea</button>
+                    <input type="text" id="task-name" class="form-control mt-2" placeholder="Tasks name">
+                    <button class="btn btn-primary mt-2" onclick="addTask()">Create task</button>
                     <ul class="list-unstyled" id="task-list">
                         <!-- Las tareas se generarán dinámicamente aquí -->
                     </ul>
-                    <button class="btn btn-primary mt-2 float-right" onclick="saveTasks()">Guardar Cambios</button>
+                    <button class="btn btn-primary mt-2 float-right" onclick="saveTasks()">Save</button>
                 </div>
             </div>
             </div>
@@ -82,20 +82,20 @@
                 // Ocultar controles si no hay listas
                 if (taskListSelector.children.length === 0) {
                     taskControls.style.display = 'none';
-                    taskListTitle.textContent = 'Lista de tareas: Ninguna seleccionada';
+                    taskListTitle.textContent = 'Task list: none';
                 } else {
                     // Seleccionar la primera lista por defecto
                     const firstList = taskListSelector.children[0];
                     if (firstList) {
                         loadTaskList(firstList.textContent.trim());
-                        taskListTitle.textContent = `Lista de tareas: ${firstList.textContent.trim()}`;
+                        taskListTitle.textContent = `Task list: ${firstList.textContent.trim()}`;
                     }
                 }
             });
             function addTask() {
                 const taskName = document.getElementById('task-name').value;
                 if (!currentTaskListName) {
-                    alert('Por favor, seleccione una lista de tareas.');
+                    alert('Please, select a task list.');
                     return;
                 }
                 if (taskName) {
@@ -104,12 +104,12 @@
                     newTask.innerHTML = `
                         <input type="checkbox" class="mr-2" onchange="toggleTask(this)"> 
                         <span class="flex-grow-1">${taskName}</span>
-                        <button class="btn btn-sm btn-danger ml-2 my-2" onclick="deleteTask(this)">Borrar</button>
+                        <button class="btn btn-sm btn-danger ml-2 my-2" onclick="deleteTask(this)">Remove</button>
                     `;
                     taskList.appendChild(newTask);
                     document.getElementById('task-name').value = ''; // Clear the input field
                 } else {
-                    alert('Por favor, ingrese un nombre para la tarea.');
+                    alert('Please, insert a name for the task');
                 }
             }
 
@@ -131,7 +131,7 @@
 
             function saveTasks() {
                 if (!currentTaskListName) {
-                    alert('Por favor, seleccione una lista de tareas.');
+                    alert('Please, select a task list.');
                     return;
                 }
                 const tasks = [];
@@ -148,9 +148,9 @@
                     body: JSON.stringify({ tasks: tasks })
                 }).then(response => response.json()).then(data => {
                     if (data.status === 'success') {
-                        alert('Tareas guardadas con éxito.');
+                        alert('ask saved successfully');
                     } else {
-                        alert('Error al guardar las tareas.');
+                        alert('Error saving the task.');
                     }
                 });
             }
@@ -166,23 +166,23 @@
                         body: JSON.stringify({ task_list_name: taskListName })
                     }).then(response => response.json()).then(data => {
                         if (data.status === 'success') {
-                            alert('Lista de tareas creada con éxito.');
+                            alert('Task list successfully created');
                             location.reload();
                         } else {
-                            alert('Error al crear la lista de tareas.');
+                            alert('Error creating the task list');
                         }
                     });
                 } else {
-                    alert('Por favor, ingrese un nombre para la lista de tareas.');
+                    alert('Please, insert a name for the task list');
                 }
             }
             function deleteCurrentTaskList() {
                 if (!currentTaskListName) {
-                    alert('No hay ninguna lista seleccionada para borrar.');
+                    alert('No list selcted to remove.');
                     return;
                 }
 
-                const confirmation = confirm(`¿Estás seguro de borrar la lista de tareas "${currentTaskListName}"?`);
+                const confirmation = confirm(`Are you sure you want to remove the list "${currentTaskListName}"?`);
                 if (confirmation) {
                     fetch(`/delete_task_list/${currentTaskListName}`, {
                         method: 'DELETE',
@@ -193,15 +193,15 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            alert(`La lista de tareas "${currentTaskListName}" ha sido borrada con éxito.`);
+                            alert(`List "${currentTaskListName}" removed successfully`);
                             location.reload(); // Recarga la página para actualizar la lista
                         } else {
-                            alert('Error al borrar la lista de tareas.');
+                            alert('Error removing the list');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Ocurrió un error al intentar borrar la lista de tareas.');
+                        alert('Error while trying to remove the task list');
                     });
                 }
             }
@@ -212,7 +212,7 @@
 
                 // Actualizar el título de la lista
                 const taskListTitle = document.getElementById('task-list-title');
-                taskListTitle.textContent = `Lista de tareas: ${taskListName}`;
+                taskListTitle.textContent = `Task list: ${taskListName}`;
 
                 // Mostrar el botón de borrar lista
                 const deleteTaskListBtn = document.getElementById('delete-task-list-btn');

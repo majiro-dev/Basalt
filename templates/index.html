@@ -11,10 +11,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Notas</a>
+                        <a class="nav-link" href="/">Notes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/tasks">Tareas</a>
+                        <a class="nav-link" href="/tasks">Tasks</a>
                     </li>
                 </ul>
             </div>
@@ -216,20 +216,5 @@
         selection.removeAllRanges();
         selection.addRange(range);
     }
-
-
-    const newNameElement = document.getElementById('newname');
-    const hiddenNewNameInput = document.getElementById('hiddenNewName');
-    const formName = newNameElement.closest('form');
-
-    // Atualiza o campo oculto sempre que o conteúdo do elemento contenteditable mudar
-    newNameElement.addEventListener('input', () => {
-        hiddenNewNameInput.value = newNameElement.innerText;
-    });
-
-    // Garante que o valor atualizado seja enviado ao submeter o formulário
-    formName.addEventListener('submit', () => {
-        hiddenNewNameInput.value = newNameElement.innerText;
-    });
     </script>
 </html>

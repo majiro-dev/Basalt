@@ -25,8 +25,7 @@ def insertar_formulario():
                 with open(folder_path + "/" + current_file , "r") as file:
                     content = file.read()
                     content = markdown_to_html(content)
-                    content = readd_links(content)
-                    print(content)
+                    #print(content)
                     name = current_file
             except FileNotFoundError:
                 content = "No file"
@@ -81,8 +80,9 @@ def get_text():
     text = request.form.get("text", "")
     text = replace_links(text)
     text = html_to_markdown(text)
-    with open(folder_path + "/" + current_file , "w") as file:
-        file.write(text)
+    if(os.path.exists((folder_path + "/" + current_file)) and not os.path.isdir((folder_path + "/" + current_file))):
+        with open(folder_path + "/" + current_file , "w") as file:
+            file.write(text)
     return redirect("/")
 
 #seleciona una carpeta
@@ -192,12 +192,6 @@ def delete_task_list(task_list_name):
 # to [[b]]
 def replace_links(text):
     return text.replace("<a href=\"/open_file?file=", "[[").replace("\" target=\"_blank\">", "]]")
-
-def readd_links(text):
-    def replace_match(match):
-        file_name = match.group(1)
-        return f'<a href="/open_file?file={file_name}" target="_blank">{file_name}</a>'
-    return re.sub(r'\[\[(.*?)\]\]', replace_match, text)
 
 def markdown_to_html(text):
     return markdown.markdown(text)
